@@ -8,8 +8,11 @@
 </head>
 <body>
     <div>
-        <input type="text" id="task" name="task">
-        <button id="btn">Add Task</button>
+        <form id="task-form"> <!-- Add an ID for easy access -->
+            <input type="text" id="task" name="task" placeholder="Enter task" required> <!-- Added 'required' attribute for form validation -->
+            <button id="btn" type="submit">Add Task</button>
+        </form>
+        
     </div>
     <h2>All Tasks List</h2>
     <div id="task-list"></div> <!-- Container for tasks -->

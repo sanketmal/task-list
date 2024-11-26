@@ -37,14 +37,16 @@ function showTask(taskList) {
   
   for (i = length; i > 0; i--) {
     const childDiv = document.createElement("div");
+    childDiv.id = `div-${i - 1}`;
     childDiv.classList.add("task-item");
 
     const taskNumber = document.createElement("span");
     taskNumber.classList.add("task-number");
     taskNumber.textContent = `${length - i + 1}. `;
 
-    const taskNameElement = document.createElement("span");
+    let taskNameElement = document.createElement("span");
     taskNameElement.classList.add("task-name");
+    taskNameElement.id = `task-number-${i-1}`
     taskNameElement.textContent = taskList[i - 1];
 
     const deleteButton = document.createElement("button");
@@ -52,30 +54,21 @@ function showTask(taskList) {
     deleteButton.id = `btn-delete-${i - 1}`;
     deleteButton.textContent = "Delete";
 
+    const editButton = document.createElement("button");
+    editButton.classList.add("btn-edit");
+    editButton.id = `btn-edit-${i-1}`;
+    editButton.textContent = "Edit";
+
     childDiv.appendChild(taskNumber);
     childDiv.appendChild(taskNameElement);
+    childDiv.appendChild(editButton);
     childDiv.appendChild(deleteButton);
+
     taskContainer.appendChild(childDiv);
+
+    deleteButton.addEventListener("click", deleteEventHandler);
+    editButton.addEventListener("click", editEventHandler);
   }
-
-  //Task in ascending order
-  // taskList.forEach((task,index) => {
-
-  //     const childDiv = document.createElement("div");
-  //     childDiv.classList.add("task-item");
-
-  //     const taskNumber = document.createElement("span");
-  //     taskNumber.classList.add("task-number");
-  //     taskNumber.textContent = `${index + 1}. `;
-
-  //     const taskNameElement = document.createElement("span");
-  //     taskNameElement.classList.add("task-name");
-  //     taskNameElement.textContent = task;
-
-  //     childDiv.appendChild(taskNumber);
-  //     childDiv.appendChild(taskNameElement);
-  //     taskContainer.appendChild(childDiv);
-  // });
 }
 
 function clearField() {
@@ -89,13 +82,59 @@ function deleteTask(index) {
   addItem("tasks", tasks); // Update localStorage
   showTask(tasks); // Refresh the task list
 }
+function saveTask(index , value){
+  tasks[index] = value;
+  console.log(value);
+  showTask(tasks);
 
-showTask(tasks);
-const wrapper = document.getElementById("task-list");
-wrapper.addEventListener("click", (event) => {
-  if (event.target.nodeName === "BUTTON") {
+}
+function deleteEventHandler(event){
+  if (event.target.nodeName === "BUTTON"){
     const buttonId = event.target.id;
     const index = parseInt(buttonId.split("-")[2]);
     deleteTask(index);
   }
-});
+  
+}
+
+function editEventHandler(event){
+    //const childDiv 
+    const buttonId = event.target.id;
+    const index = parseInt(buttonId.split("-")[2]);
+    const childDiv = document.getElementById(`div-${index}`);
+    let defaultValue = document.getElementById(`task-number-${index}`).innerText;
+    
+    //Remove the task which want to edit
+    const taskToRemove = document.getElementById(`task-number-${index}`);
+    
+     // Create an input field for editing
+    let newTaskNameElement = document.createElement("input");
+    newTaskNameElement.type = "text";
+    newTaskNameElement.value = defaultValue;
+    
+    newTaskNameElement.classList.add("edit-task-input");
+    newTaskNameElement.id = `edit-task-${index}`;
+
+    // Replace the Edit button with a Save button
+    const editButton = document.getElementById(`btn-edit-${index}`);
+    const saveButton = document.createElement("button");
+    saveButton.classList.add("btn-save");
+    saveButton.id = `btn-save-${index}`;
+    saveButton.textContent = "Save";    
+
+    childDiv.replaceChild(newTaskNameElement, taskToRemove);
+    childDiv.replaceChild(saveButton, editButton);
+    let editTaskName =  defaultValue;
+    newTaskNameElement.addEventListener("input", (event) => {
+      editTaskName = event.target.value;
+      console.log(event.target.value)
+    });
+    // Handle save operation
+    saveButton.addEventListener("click", (event) => 
+    {
+      saveTask(index, editTaskName);
+    });
+
+}
+showTask(tasks);
+
